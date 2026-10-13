@@ -3,13 +3,49 @@ services:
     image: "redis:alpine"
     ports:
       - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   web:
     build:
       dockerfile: Dockerfile.dev
     ports:
       - "${CONTAINER_PORT_1}:${WEB_PORT}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
   web-2:
     build:
       dockerfile: Dockerfile.dev
     ports:
       - "${CONTAINER_PORT_2}:${WEB_PORT}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web-3:
+    build:
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${CONTAINER_PORT_3}:${WEB_PORT}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web-4:
+    build:
+      dockerfile: Dockerfile.dev
+    ports:
+      - "${CONTAINER_PORT_4}:${WEB_PORT}"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
